@@ -1,16 +1,13 @@
 package academy.devdojo.springboot2_essentials.controller;
 
-import academy.devdojo.springboot2_essentials.domain.Anime;
+import academy.devdojo.springboot2_essentials.Requests.AnimePostRequestBody;
+import academy.devdojo.springboot2_essentials.Requests.AnimePutRequestBody;
 import academy.devdojo.springboot2_essentials.domain.Anime;
 import academy.devdojo.springboot2_essentials.service.AnimeService;
-import academy.devdojo.springboot2_essentials.util.DateUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +19,34 @@ public class AnimeController {
     private final AnimeService animeService;
 
     @GetMapping
-    public List<Anime> list() {
-        return animeService.listAll();
+    public ResponseEntity<List<Anime>> list() {
+        return new ResponseEntity<>(animeService.listAll(),HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Anime> findById(@PathVariable long id) {
+        return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestException(id));
+    }
+
+    @GetMapping(path = "/find")
+    public ResponseEntity<List<Anime>> findByName(@RequestParam(required = true) String name) {
+        return ResponseEntity.ok(animeService.findByName(name));
+    }
+
+    @PostMapping
+    public ResponseEntity<Anime> save(@RequestBody AnimePostRequestBody animePostRequestBody){
+        return new ResponseEntity<>(animeService.save(animePostRequestBody),HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id){
+        animeService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> replace(@RequestBody AnimePutRequestBody animePutRequestBody){
+        animeService.replace(animePutRequestBody);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
