@@ -7,19 +7,19 @@ import academy.devdojo.springboot2_essentials.exception.BadRequestException;
 import academy.devdojo.springboot2_essentials.mapper.AnimeMapper;
 import academy.devdojo.springboot2_essentials.repository.AnimeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
 public class AnimeService {
     private final AnimeRepository animeRepository;
-    public List<Anime> listAll(){
-        return animeRepository.findAll();
+    public Page<Anime> listAll(Pageable pageable){
+        return animeRepository.findAll(pageable);
     }
 
     public List<Anime> findByName(String name){
@@ -31,6 +31,7 @@ public class AnimeService {
                 .orElseThrow(() -> new BadRequestException("Anime Id not found"));
     }
 
+    @Transactional
     public Anime save(AnimePostRequestBody animePostRequestBody) {
         return animeRepository.save(AnimeMapper.INSTANCE.toAnime(animePostRequestBody));
     }

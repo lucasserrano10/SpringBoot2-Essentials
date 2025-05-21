@@ -4,12 +4,14 @@ import academy.devdojo.springboot2_essentials.Requests.AnimePostRequestBody;
 import academy.devdojo.springboot2_essentials.Requests.AnimePutRequestBody;
 import academy.devdojo.springboot2_essentials.domain.Anime;
 import academy.devdojo.springboot2_essentials.service.AnimeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,8 +21,8 @@ public class AnimeController {
     private final AnimeService animeService;
 
     @GetMapping
-    public ResponseEntity<List<Anime>> list() {
-        return new ResponseEntity<>(animeService.listAll(),HttpStatus.OK);
+    public ResponseEntity<Page<Anime>> list(Pageable pageable) {
+        return new ResponseEntity<>(animeService.listAll(pageable),HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
@@ -29,12 +31,12 @@ public class AnimeController {
     }
 
     @GetMapping(path = "/find")
-    public ResponseEntity<List<Anime>> findByName(@RequestParam(required = true) String name) {
+    public ResponseEntity<List<Anime>> findByName(@RequestParam(required = true)  String name) {
         return ResponseEntity.ok(animeService.findByName(name));
     }
 
     @PostMapping
-    public ResponseEntity<Anime> save(@RequestBody AnimePostRequestBody animePostRequestBody){
+    public ResponseEntity<Anime> save(@RequestBody @Valid AnimePostRequestBody animePostRequestBody) throws Exception{
         return new ResponseEntity<>(animeService.save(animePostRequestBody),HttpStatus.CREATED);
     }
 
